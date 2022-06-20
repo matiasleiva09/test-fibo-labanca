@@ -2,6 +2,8 @@ package com.matiasleiva.fibonacci.model.service.impl;
 
 import com.matiasleiva.fibonacci.model.bo.Fibonacci;
 import com.matiasleiva.fibonacci.model.bo.FibonacciEstadistica;
+import com.matiasleiva.fibonacci.model.dto.FibonacciDto;
+import com.matiasleiva.fibonacci.model.dto.FibonacciEstadisticaDto;
 import com.matiasleiva.fibonacci.model.mapper.AppMapper;
 import com.matiasleiva.fibonacci.model.repository.FibonacciEstadisticaRepository;
 import com.matiasleiva.fibonacci.model.repository.FibonacciRepository;
@@ -24,7 +26,7 @@ public class FibonacciServiceImpl implements FibonacciService {
     private AppMapper mapper;
 
     @Override
-    public ResponseEntity<Object> obtenerEnesimo(Long enesimo) {
+    public ResponseEntity<FibonacciDto> obtenerEnesimo(Long enesimo) {
         validacionBasica(enesimo);
         Optional<Fibonacci> resultado = Optional.ofNullable(repository.obtenerFibonacci(enesimo));
         if (!resultado.isEmpty()) {
@@ -33,7 +35,7 @@ public class FibonacciServiceImpl implements FibonacciService {
                 repositoryEstadistica.save(FibonacciEstadistica.builder().numero(enesimo).cantidad(1L).build());
             else
                 repositoryEstadistica.save(fiboEst.get());
-            return new ResponseEntity<>(mapper.fromObToDto(resultado.get()), HttpStatus.OK);
+            return new ResponseEntity<FibonacciDto>(mapper.fromObToDto(resultado.get()), HttpStatus.OK);
         } else
             throw new NotFoundException("No se encuentran resultados");
     }
@@ -46,12 +48,12 @@ public class FibonacciServiceImpl implements FibonacciService {
     }
 
     @Override
-    public ResponseEntity<Object> obtenerEstadistica(Long numero) {
+    public ResponseEntity<FibonacciEstadisticaDto> obtenerEstadistica(Long numero) {
         validacionBasica(numero);
         Optional<FibonacciEstadistica> est = Optional.ofNullable(repositoryEstadistica.findByNumero(numero));
         if (est.isEmpty())
             throw new NotFoundException("No se ha encontrado datos");
         else
-            return new ResponseEntity<>(mapper.fromObToDtoEstadistica(est.get()), HttpStatus.OK);
+            return new ResponseEntity<FibonacciEstadisticaDto>(mapper.fromObToDtoEstadistica(est.get()), HttpStatus.OK);
     }
 }

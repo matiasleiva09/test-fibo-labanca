@@ -1,5 +1,6 @@
 package com.matiasleiva.fibonacci.rest;
 
+import com.matiasleiva.fibonacci.model.bo.FibonacciEstadistica;
 import com.matiasleiva.fibonacci.model.dto.FibonacciDto;
 import com.matiasleiva.fibonacci.model.dto.FibonacciEstadisticaDto;
 import com.matiasleiva.fibonacci.model.service.impl.FibonacciServiceImpl;
@@ -33,23 +34,28 @@ class FibonacciControllerTest {
                 .build();
     }
 
-    public ResponseEntity<Object> getResultadoOkFibo() {
+    public ResponseEntity<FibonacciDto> getResultadoOkFibo() {
         FibonacciDto fibo = FibonacciDto.builder().id(10L).numero(24L).build();
-        return new ResponseEntity<Object>(fibo, HttpStatus.OK);
+        return new ResponseEntity<FibonacciDto>(fibo, HttpStatus.OK);
     }
 
-    public ResponseEntity<Object> getEstadisticaOk()
+    public ResponseEntity<FibonacciEstadisticaDto> getEstadisticaOk()
     {
         FibonacciEstadisticaDto fibo = FibonacciEstadisticaDto.builder()
                 .id(1L)
                 .numero(10L)
                 .cantidad(1L)
                 .build();
-        return new ResponseEntity<Object>(fibo,HttpStatus.OK);
+        return new ResponseEntity<FibonacciEstadisticaDto>(fibo,HttpStatus.OK);
     }
 
-    public ResponseEntity<Object> getResultadoErrorFibo() {
-        return new ResponseEntity<Object>(null, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<FibonacciDto> getResultadoErrorFibo() {
+        return new ResponseEntity<FibonacciDto>(new FibonacciDto(), HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<FibonacciEstadisticaDto> getResultadoErrorEstadistica()
+    {
+        return new ResponseEntity<FibonacciEstadisticaDto>(new FibonacciEstadisticaDto(),HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -73,7 +79,7 @@ class FibonacciControllerTest {
     @Test
     void estadoEstadistcaError() throws Exception{
         final Long numero=-1L;
-        when(service.obtenerEstadistica(numero)).thenReturn(getResultadoErrorFibo());
+        when(service.obtenerEstadistica(numero)).thenReturn(getResultadoErrorEstadistica());
         mockMvc.perform(get("/fibonacci/" + numero + "/estadistica")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
